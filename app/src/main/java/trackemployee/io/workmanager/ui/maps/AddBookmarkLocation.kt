@@ -45,7 +45,7 @@ class AddBookmarkLocation : BaseActivity() {
         mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(OnMapReadyCallback {
            googleMap = it
-            if ( application.checkLocationPermission()) {
+            if ( application.isGPSEnabled() &&  application.checkLocationPermission()) {
                 LocationServices.getFusedLocationProviderClient(application)
                         ?.lastLocation
                         ?.addOnSuccessListener { location: android.location.Location? ->

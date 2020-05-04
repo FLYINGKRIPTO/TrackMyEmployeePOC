@@ -36,8 +36,7 @@ class LocationRepository @Inject constructor(
         /*
          * One time location request
          */
-        //application.isGPSEnabled()
-        if ( application.checkLocationPermission()) {
+        if ( application.isGPSEnabled() && application.checkLocationPermission()) {
             var latitude : Double? = null
             var longitude : Double? = null
             var result : FloatArray = FloatArray(2).apply {
