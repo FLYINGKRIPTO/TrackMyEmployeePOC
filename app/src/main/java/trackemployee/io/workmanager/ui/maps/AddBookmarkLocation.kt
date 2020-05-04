@@ -4,6 +4,7 @@ import android.content.IntentSender
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -54,7 +55,8 @@ class AddBookmarkLocation : BaseActivity() {
 
         saveBtn.setOnClickListener {
             viewModel.saveLocation(Location(id = 0,landmark = editTextBookmark.text.toString(),longitude = longitude!!,latitude = latitude!!, timestamp = System.currentTimeMillis()))
-
+            Toast.makeText(this,"Saved",Toast.LENGTH_SHORT).show()
+            finish()
         }
         getFromLocationWithPermissionCheck()
         observe(viewModel.enableLocation) {
