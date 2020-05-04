@@ -1,5 +1,7 @@
 package trackemployee.io.workmanager.ui.maps
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -14,6 +16,7 @@ import trackemployee.io.workmanager.ui.main.MainViewModel
 import trackemployee.io.workmanager.utility.extentions.checkLocationPermission
 import trackemployee.io.workmanager.utility.extentions.getViewModel
 import trackemployee.io.workmanager.utility.extentions.isGPSEnabled
+import trackemployee.io.workmanager.utility.makeStatusNotification
 import trackemployee.io.workmanager.viewmodel.ViewModelFactory
 import javax.inject.Inject
 
@@ -24,6 +27,10 @@ class AddBookmarkLocation : BaseActivity() {
     @Inject lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel : MainViewModel
 
+    private lateinit var saveBtn  : Button
+    private lateinit var editTextBookmark : EditText
+    private  var latitude : Double? = null
+    private var longitude : Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +38,14 @@ class AddBookmarkLocation : BaseActivity() {
 
         viewModel = getViewModel(MainViewModel::class.java, viewModelFactory = viewModelFactory)
 
+       saveBtn = findViewById(R.id.save_bookmark)
+        editTextBookmark = findViewById(R.id.location_name)
+
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(OnMapReadyCallback {
            googleMap = it
-            if (application.isGPSEnabled() && application.checkLocationPermission()) {
+            if ( application.checkLocationPermission()) {
                 LocationServices.getFusedLocationProviderClient(application)
                         ?.lastLocation
                         ?.addOnSuccessListener { location: android.location.Location? ->
@@ -47,11 +57,19 @@ class AddBookmarkLocation : BaseActivity() {
                                     googleMap.clear()
                                     googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
                                     googleMap.addMarker(this)
-                                    viewModel.saveLocation(Location(id = 0,landmark = "Office",longitude = location.longitude,latitude = location.latitude, timestamp = System.currentTimeMillis()))
+                                    latitude = location.latitude
+                                    longitude = location.longitude
                                 }
                             }
+                        }?.addOnFailureListener{
+                            makeStatusNotification("Failed due to : ${it.localizedMessage}", this)
                         }
             }
         })
+
+        saveBtn.setOnClickListener {
+            viewModel.saveLocation(Location(id = 0,landmark = editTextBookmark.text.toString(),longitude = longitude!!,latitude = latitude!!, timestamp = System.currentTimeMillis()))
+
+        }
     }
 }
