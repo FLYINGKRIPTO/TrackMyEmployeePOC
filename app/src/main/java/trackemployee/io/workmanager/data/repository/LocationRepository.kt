@@ -40,7 +40,6 @@ class LocationRepository @Inject constructor(
             var latitude : Double? = null
             var longitude : Double? = null
             var result : FloatArray = FloatArray(2).apply {
-                this.plus(13.33F)
             }
             LocationServices.getFusedLocationProviderClient(application)
                     ?.lastLocation
@@ -50,11 +49,14 @@ class LocationRepository @Inject constructor(
                                     onNext = {
                                         latitude = it[0].latitude
                                         longitude = it[0].longitude
-                                        Timber.e("latitude : $latitude :::::: longitude : $longitude")
                                         Timber.e(" DISTANCE ${latitude}  :::: ${location.latitude}")
                                         Timber.e(" DISTANCE ${longitude} :::: ${location.longitude}")
-                                        android.location.Location.distanceBetween(latitude!!,longitude!!,location.latitude,location.longitude, result )
-                                        val distanceInMeters = result.last()
+                                        val endPoint  = android.location.Location("locationB")
+                                        endPoint.latitude = latitude!!
+                                        endPoint.longitude = longitude!!
+
+                                      //  android.location.Location.distanceBetween(latitude!!,longitude!!,location.latitude,location.longitude, result )
+                                        val distanceInMeters = location.distanceTo(endPoint)
                                         Timber.e("DISTANCE IN METERS ${result.size}  $distanceInMeters")
                                         when {
                                             distanceInMeters > 50.0 -> {
